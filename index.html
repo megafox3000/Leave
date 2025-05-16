@@ -1,7 +1,45 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Video Analyzer</title>
+</head>
 <body>
-<h1>Hello World</h1>
-<p>I'm hosted with GitHub Pages.</p>
+  <h2>Загрузка видео</h2>
+  <input type="file" id="videoFile" />
+  <button onclick="upload()">Отправить</button>
+  <pre id="result"></pre>
+
+  <script>
+    async function upload() {
+      const fileInput = document.getElementById('videoFile');
+      const resultArea = document.getElementById('result');
+
+      if (!fileInput.files.length) {
+        alert("Выберите видеофайл");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+
+      try {
+        const response = await fetch('https://video-meta-api.onrender.com/analyze', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) {
+          const error = await response.text();
+          throw new Error(error);
+        }
+
+        const data = await response.json();
+        resultArea.textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        resultArea.textContent = 'Ошибка: ' + error.message;
+      }
+    }
+  </script>
 </body>
 </html>
